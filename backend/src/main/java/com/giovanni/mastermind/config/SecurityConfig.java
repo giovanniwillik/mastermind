@@ -1,4 +1,4 @@
-package main.java.com.giovanni.mastermind.config;
+package com.giovanni.mastermind.config;
 
 public class SecurityConfig {
     

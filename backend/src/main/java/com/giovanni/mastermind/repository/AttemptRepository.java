@@ -1,4 +1,4 @@
-package main.java.com.giovanni.mastermind.repository;
+package com.giovanni.mastermind.repository;
 
 public class AttemptRepository {
     

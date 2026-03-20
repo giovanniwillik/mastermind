@@ -1,4 +1,4 @@
-package main.java.com.giovanni.mastermind.service;
+package com.giovanni.mastermind.service;
 
 public class AuthService {
     

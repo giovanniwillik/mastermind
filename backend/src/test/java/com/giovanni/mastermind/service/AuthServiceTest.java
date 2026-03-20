@@ -1,4 +1,4 @@
-package test.java.com.giovanni.mastermind.service;
+package com.giovanni.mastermind.service;
 
 public class AuthServiceTest {
     

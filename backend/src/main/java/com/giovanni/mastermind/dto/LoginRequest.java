@@ -1,4 +1,4 @@
-package main.java.com.giovanni.mastermind.dto;
+package com.giovanni.mastermind.dto;
 
 public class LoginRequest {
     
