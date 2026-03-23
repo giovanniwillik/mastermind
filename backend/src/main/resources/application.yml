@@ -1,25 +1,36 @@
 spring:
+  application:
+    name: mastermind
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/mastermind
-    username: user
-    password: password
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/mastermind}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
-  
+
   jpa:
     hibernate:
-      ddl-auto: validate # O Flyway gerenciará o schema
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
 
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
+  sql:
+    init:
+      mode: always # Sempre executa para testes locais
 
-# Documentação Swagger
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:change-this-secret-key-with-at-least-32-characters}
+  expiration: ${JWT_EXPIRATION:86400000}
+
 springdoc:
-  api-docs:
-    path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
