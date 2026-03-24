@@ -1,5 +1,7 @@
-package main.java.com.giovanni.mastermind.exception;
+package com.giovanni.mastermind.exception;
 
-public class BusinessException {
-    
+public class BusinessException extends RuntimeException {
+    public BusinessException(String message) {
+        super(message);
+    }
 }

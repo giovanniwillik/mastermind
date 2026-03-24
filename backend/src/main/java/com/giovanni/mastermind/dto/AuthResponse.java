@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class RankingResponse {
+@NoArgsConstructor
+public class AuthResponse {
+    private String token;
     private String username;
-    private Integer bestScore;
-    private Integer totalGames;
-    private Double averageDuration;
 }

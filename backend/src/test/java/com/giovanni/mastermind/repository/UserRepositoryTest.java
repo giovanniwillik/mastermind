@@ -1,4 +1,4 @@
-package test.java.com.giovanni.mastermind.repository;
+package com.giovanni.mastermind.repository;
 
 public class UserRepositoryTest {
     

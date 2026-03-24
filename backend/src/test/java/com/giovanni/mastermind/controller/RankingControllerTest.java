@@ -1,4 +1,4 @@
-package test.java.com.giovanni.mastermind.controller;
+package com.giovanni.mastermind.controller;
 
 public class RankingControllerTest {
     
