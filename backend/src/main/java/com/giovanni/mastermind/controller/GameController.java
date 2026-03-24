@@ -29,6 +29,11 @@ public class GameController {
         return ResponseEntity.ok(gameService.startGame(authentication));
     }
 
+    @GetMapping
+    public ResponseEntity<List<GameListResponse>> getPlayerGames(Authentication authentication) {
+        return ResponseEntity.ok(gameService.getPlayerGames(authentication));
+    }
+
     @PostMapping("/{gameCode}/guess")
     public ResponseEntity<GuessResponse> submitGuess(
             @PathVariable UUID gameCode,
@@ -37,15 +42,10 @@ public class GameController {
         return ResponseEntity.ok(gameService.submitGuess(gameCode, request.getGuess(), authentication));
     }
 
-    @GetMapping
-    public ResponseEntity<List<GameListResponse>> getPlayerGames(Authentication authentication) {
-        return ResponseEntity.ok(gameService.getPlayerGames(authentication));
-    }
-
-    @GetMapping("/{gameId}")
+    @GetMapping("/{gameCode}")
     public ResponseEntity<GameDetailResponse> getGameDetail(
-            @PathVariable Long gameId,
+            @PathVariable UUID gameCode,
             Authentication authentication) {
-        return ResponseEntity.ok(gameService.getGameDetail(gameId, authentication));
+        return ResponseEntity.ok(gameService.getGameDetail(gameCode, authentication));
     }
 }

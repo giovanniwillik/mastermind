@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameDetailResponse {
-    private Long id;
+
     private UUID gameCode;
     private String status; // WON, LOST, IN_PROGRESS
     private String expectedCode;
@@ -31,6 +31,7 @@ public class GameDetailResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class AttemptResponse {
+
         private Integer attemptNumber;
         private String guess;
         private Integer exactMatches;

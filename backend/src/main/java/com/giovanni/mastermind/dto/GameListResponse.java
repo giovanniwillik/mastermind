@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameListResponse {
-    private Long id;
+
     private UUID gameCode;
     private String status; // WON, LOST, IN_PROGRESS
     private Integer finalScore;

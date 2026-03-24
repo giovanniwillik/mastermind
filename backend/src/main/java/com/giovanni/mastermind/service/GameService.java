@@ -42,9 +42,13 @@ public class GameService {
                 .startedAt(LocalDateTime.now())
                 .build();
 
-        gameRepository.save(game);
+        game = gameRepository.save(game);
 
-        return new StartGameResponse(gameCode, "Partida iniciada!");
+        return StartGameResponse.builder()
+                .id(game.getId())
+                .gameCode(gameCode)
+                .message("Partida iniciada!")
+                .build();
     }
 
     public GuessResponse submitGuess(UUID gameCode, String guess, Authentication authentication) {
@@ -153,18 +157,18 @@ public class GameService {
     private void finishGame(Game game, boolean won) {
         LocalDateTime finishedAt = LocalDateTime.now();
         game.setFinishedAt(finishedAt);
-        
+
         // Calcular duração em segundos
         long durationSeconds = java.time.temporal.ChronoUnit.SECONDS.between(game.getStartedAt(), finishedAt);
         game.setDurationSeconds((int) durationSeconds);
-        
+
         // Calcular pontuação final: baseada em tentativas restantes se vitória, 0 se derrota
         if (won) {
             int attemptsRemaining = game.getMaxAttempts() - game.getCurrentAttempt();
-            int finalScore = (attemptsRemaining * 100) + (1000 - (int)durationSeconds); // Bônus por tentativas restantes e penalidade por tempo
+            int finalScore = (attemptsRemaining * 100) + (1000 - (int) durationSeconds); // Bônus por tentativas restantes e penalidade por tempo
             finalScore = Math.max(finalScore, 100); // Mínimo de 100 pontos para vitória
             game.setFinalScore(finalScore);
-            
+
             // Atualizar bestScore do usuário se necessário
             User user = game.getUser();
             if (finalScore > user.getBestScore()) {
@@ -183,22 +187,21 @@ public class GameService {
                 .collect(Collectors.toList());
     }
 
-    public GameDetailResponse getGameDetail(Long gameId, Authentication authentication) {
+    public GameDetailResponse getGameDetail(UUID gameCode, Authentication authentication) {
         User user = getCurrentUser(authentication);
-        Game game = gameRepository.findById(gameId)
+        Game game = gameRepository.findByGameCode(gameCode)
                 .orElseThrow(() -> new RuntimeException("Partida não encontrada"));
-        
+
         // Verificar se o usuário é o dono da partida
         if (!game.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Não autorizado");
         }
-        
+
         return mapToGameDetailResponse(game);
     }
 
     private GameListResponse mapToGameListResponse(Game game) {
         return GameListResponse.builder()
-                .id(game.getId())
                 .gameCode(game.getGameCode())
                 .status(game.getStatus().name())
                 .finalScore(game.getFinalScore())
@@ -213,16 +216,15 @@ public class GameService {
     private GameDetailResponse mapToGameDetailResponse(Game game) {
         List<GameDetailResponse.AttemptResponse> attempts = game.getAttempts().stream()
                 .map(attempt -> GameDetailResponse.AttemptResponse.builder()
-                        .attemptNumber(attempt.getAttemptNumber())
-                        .guess(attempt.getGuess())
-                        .exactMatches(attempt.getExactMatches())
-                        .partialMatches(attempt.getPartialMatches())
-                        .createdAt(attempt.getCreatedAt())
-                        .build())
+                .attemptNumber(attempt.getAttemptNumber())
+                .guess(attempt.getGuess())
+                .exactMatches(attempt.getExactMatches())
+                .partialMatches(attempt.getPartialMatches())
+                .createdAt(attempt.getCreatedAt())
+                .build())
                 .collect(Collectors.toList());
 
         return GameDetailResponse.builder()
-                .id(game.getId())
                 .gameCode(game.getGameCode())
                 .status(game.getStatus().name())
                 .expectedCode(game.getExpectedCode())

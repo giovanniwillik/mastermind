@@ -12,6 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class StartGameResponse {
+
+    private Long id;
     private UUID gameCode;
     private String message;
 }

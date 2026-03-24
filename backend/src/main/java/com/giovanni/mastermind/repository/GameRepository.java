@@ -9,7 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
+
     Optional<Game> findByGameCode(UUID gameCode);
+
     List<Game> findByUser(User user);
+
     List<Game> findByUserOrderByStartedAtDesc(User user);
 }

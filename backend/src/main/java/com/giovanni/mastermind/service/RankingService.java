@@ -39,17 +39,17 @@ public class RankingService {
                 .collect(Collectors.toList());
 
         int totalGames = finishedGames.size();
-        
+
         // Calcular melhor pontuação a partir das partidas vencidas
         int bestScore = finishedGames.stream()
                 .filter(game -> game.getStatus() == GameStatus.WON)
                 .mapToInt(Game::getFinalScore)
                 .max()
                 .orElse(0);
-        
+
         // Calcular duração média apenas das partidas finalizadas
-        double avgDuration = totalGames > 0 ?
-                finishedGames.stream()
+        double avgDuration = totalGames > 0
+                ? finishedGames.stream()
                         .mapToInt(Game::getDurationSeconds)
                         .average()
                         .orElse(0) : 0;
