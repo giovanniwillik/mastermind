@@ -31,14 +31,6 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    /**
-     * Cria um novo usuário com todas as validações.
-     * O usuário só será salvo no banco se passar por TODAS as validações.
-     *
-     * @param request dados do novo usuário
-     * @return usuário criado
-     * @throws UserAlreadyExistsException se username ou email já existem
-     */
     @Transactional
     public User createUser(SignUpRequest request) {
         // Validação 1: Username já existe?
@@ -78,6 +70,11 @@ public class UserService {
                 .bestScore(0)
                 .build();
 
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateUser(User user) {
         return userRepository.save(user);
     }
 }

@@ -34,7 +34,7 @@ public class Game {
     private String expectedCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", columnDefinition = "VARCHAR(20)")
     private GameStatus status;
 
     @Column(nullable = false)

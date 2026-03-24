@@ -1,6 +1,3 @@
--- Create ENUM type for GameStatus
-CREATE TYPE game_status AS ENUM ('IN_PROGRESS', 'WON', 'LOST');
-
 -- Create users table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -17,7 +14,7 @@ CREATE TABLE games (
     game_code UUID NOT NULL UNIQUE,
     user_id INTEGER NOT NULL,
     expected_code VARCHAR(4) NOT NULL,
-    status game_status NOT NULL DEFAULT 'IN_PROGRESS',
+    status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
     final_score INTEGER NOT NULL DEFAULT 0,
     duration_seconds INTEGER NOT NULL DEFAULT 0,
     max_attempts INTEGER NOT NULL DEFAULT 10,

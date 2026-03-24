@@ -3,6 +3,7 @@ package com.giovanni.mastermind.service;
 import com.giovanni.mastermind.dto.RankingResponse;
 import com.giovanni.mastermind.model.User;
 import com.giovanni.mastermind.model.Game;
+import com.giovanni.mastermind.model.GameStatus;
 import com.giovanni.mastermind.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,9 +21,11 @@ public class RankingService {
         return userRepository.findAll().stream()
                 .map(this::mapToRankingResponse)
                 .sorted((a, b) -> {
+                    // Primeiro: ordenar por bestScore (decrescente)
                     if (!a.getBestScore().equals(b.getBestScore())) {
                         return b.getBestScore().compareTo(a.getBestScore());
                     }
+                    // Tiebreaker: ordenar por totalGames (decrescente)
                     return b.getTotalGames().compareTo(a.getTotalGames());
                 })
                 .limit(limit)
@@ -30,16 +33,32 @@ public class RankingService {
     }
 
     private RankingResponse mapToRankingResponse(User user) {
-        // Lógica simplificada - em produção, use queries otimizadas
-        int totalGames = user.getGames().size();
+        // Filtrar apenas as partidas finalizadas
+        List<Game> finishedGames = user.getGames().stream()
+                .filter(game -> game.getStatus() != GameStatus.IN_PROGRESS)
+                .collect(Collectors.toList());
+
+        int totalGames = finishedGames.size();
+        
+        // Calcular melhor pontuação a partir das partidas vencidas
+        int bestScore = finishedGames.stream()
+                .filter(game -> game.getStatus() == GameStatus.WON)
+                .mapToInt(Game::getFinalScore)
+                .max()
+                .orElse(0);
+        
+        // Calcular duração média apenas das partidas finalizadas
         double avgDuration = totalGames > 0 ?
-                user.getGames().stream().mapToInt(Game::getDurationSeconds).average().orElse(0) : 0;
+                finishedGames.stream()
+                        .mapToInt(Game::getDurationSeconds)
+                        .average()
+                        .orElse(0) : 0;
 
         return RankingResponse.builder()
                 .username(user.getUsername())
-                .bestScore(user.getBestScore())
+                .bestScore(bestScore)
                 .totalGames(totalGames)
-                .averageDuration((double) Math.round(avgDuration))
+                .averageDuration(Math.round(avgDuration * 100.0) / 100.0) // Arredondar para 2 casas decimais
                 .build();
     }
 }
