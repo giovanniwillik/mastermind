@@ -1,0 +1,214 @@
+<div class="history-container">
+  <div class="history-header">
+    <h2>Histórico de Jogos</h2>
+    <button class="btn btn-secondary" (click)="goToDashboard()">Voltar ao Dashboard</button>
+  </div>
+
+  <div class="history-content">
+    <!-- Carregamento -->
+    <div class="loading" *ngIf="isLoading">
+      <p>Carregando histórico...</p>
+    </div>
+
+    <!-- Lista Vazia -->
+    <div class="empty-state" *ngIf="!isLoading && games.length === 0">
+      <p>Nenhum jogo encontrado. Comece um novo jogo no dashboard!</p>
+      <button class="btn btn-primary" (click)="goToDashboard()">Ir para Dashboard</button>
+    </div>
+
+    <!-- Lista de Jogos -->
+    <div class="games-list" *ngIf="!isLoading && games.length > 0">
+      <div class="game-card" *ngFor="let game of games" [class]="getStatusClass(game.status)">
+        <div class="game-card-header">
+          <div class="game-status">
+            {{ getStatusText(game.status) }}
+          </div>
+          <div class="game-date">
+            {{ formatDate(game.startedAt) }}
+          </div>
+        </div>
+
+        <div class="game-card-content">
+          <div class="game-info-row">
+            <span class="label">Código do Jogo:</span>
+            <span class="value">{{ game.gameCode | slice:0:8 }}</span>
+          </div>
+          <div class="game-info-row">
+            <span class="label">Tentativas:</span>
+            <span class="value">{{ game.currentAttempt }} / {{ game.maxAttempts }}</span>
+          </div>
+          <div class="game-info-row" *ngIf="game.finishedAt">
+            <span class="label">Duração:</span>
+            <span class="value">{{ getGameDuration(game.startedAt, game.finishedAt) }}</span>
+          </div>
+        </div>
+
+        <div class="game-card-actions">
+          <button
+            class="btn btn-small btn-primary"
+            (click)="loadGameDetail(game.gameCode)"
+            [disabled]="isDetailLoading"
+          >
+            Ver Detalhes
+          </button>
+          <button
+            class="btn btn-small btn-secondary"
+            (click)="playGame(game.gameCode)"
+            *ngIf="game.status === 'IN_PROGRESS'"
+          >
+            Continuar Jogo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalhes -->
+  <div class="detail-modal" *ngIf="selectedGameDetail">
+    <div class="modal-backdrop" (click)="closeDetail()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Detalhes do Jogo</h2>
+        <button class="close-btn" (click)="closeDetail()">✕</button>
+      </div>
+
+      <div class="modal-loading" *ngIf="isDetailLoading">
+        <p>Carregando detalhes...</p>
+      </div>
+
+      <div class="modal-body" *ngIf="!isDetailLoading && selectedGameDetail">
+        <!-- Informações Gerais -->
+        <div class="info-section">
+          <h3>Informações Gerais</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Status:</span>
+              <span class="value" [class]="'status-' + selectedGameDetail.status.toLowerCase()">
+                {{ getStatusText(selectedGameDetail.status) }}
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="label">Código:</span>
+              <span class="value">{{ selectedGameDetail.gameCode | slice:0:8 }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Tentativas:</span>
+              <span class="value">{{ selectedGameDetail.currentAttempt }} / {{ selectedGameDetail.maxAttempts }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Duração:</span>
+              <span class="value">{{ getDurationText(selectedGameDetail.durationSeconds || 0) }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedGameDetail.startedAt">
+              <span class="label">Início:</span>
+              <span class="value">{{ formatDate(selectedGameDetail.startedAt) }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedGameDetail.finishedAt">
+              <span class="label">Término:</span>
+              <span class="value">{{ formatDate(selectedGameDetail.finishedAt) }}</span>
+            </div>
+            <div class="info-item" *ngIf="selectedGameDetail.status === 'WON'">
+              <span class="label">Pontuação:</span>
+              <div class="score-with-info">
+                <span class="value">{{ calculateScore(selectedGameDetail) }}</span>
+                <span class="info-icon" title="{{ formatScoreCalculation(selectedGameDetail) }}">ℹ️</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combinação (se perdeu) -->
+        <div class="secret-section" *ngIf="selectedGameDetail.status === 'LOST' && selectedGameDetail.expectedCode">
+          <h3>Combinação Correta</h3>
+          <div class="secret-pegs">
+            <span
+              *ngFor="let color of selectedGameDetail.expectedCode.split('')"
+              class="peg"
+              [class]="'color-' + color.toLowerCase()"
+              [attr.data-color]="colorNames[color]"
+              (mouseenter)="hoveredColor = color"
+              (mouseleave)="hoveredColor = null"
+            ></span>
+          </div>
+          <div class="color-list">
+            <p *ngFor="let color of (selectedGameDetail.expectedCode || '').split(''); let last = last">
+              <strong>{{ color }}</strong> = {{ colorNames[color] }}<span *ngIf="!last">,&nbsp;</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Tabuleiro Final -->
+        <div class="board-section">
+          <h3>Tabuleiro Final</h3>
+          <div class="final-board">
+            <!-- Tentativas Realizadas -->
+            <div class="board-row" *ngFor="let attempt of selectedGameDetail.attempts">
+              <div class="row-num">{{ attempt.attemptNumber }}</div>
+              <div class="pegs">
+                <span
+                  *ngFor="let color of attempt.guess.split('')"
+                  class="peg"
+                  [class]="'color-' + color.toLowerCase()"
+                  [attr.title]="colorNames[color]"
+                ></span>
+              </div>
+              <div class="feedback">
+                <span *ngFor="let i of [].constructor(attempt.exactMatches)" class="feedback-peg exact"></span>
+                <span *ngFor="let i of [].constructor(attempt.partialMatches)" class="feedback-peg partial"></span>
+                <span *ngFor="let i of [].constructor(4 - attempt.exactMatches - attempt.partialMatches)" class="feedback-peg empty"></span>
+              </div>
+              <div class="attempt-time">{{ formatDate(attempt.createdAt) }}</div>
+            </div>
+
+            <!-- Linhas Vazias (para as tentativas não realizadas) -->
+            <div class="board-row empty" *ngFor="let n of [].constructor((selectedGameDetail.maxAttempts || 10) - (selectedGameDetail.attempts.length || 0))">
+              <div class="row-num">{{ (selectedGameDetail.attempts.length || 0) + n + 1 }}</div>
+              <div class="pegs">
+                <span class="peg empty"></span>
+                <span class="peg empty"></span>
+                <span class="peg empty"></span>
+                <span class="peg empty"></span>
+              </div>
+              <div class="feedback">
+                <span class="feedback-peg empty"></span>
+                <span class="feedback-peg empty"></span>
+                <span class="feedback-peg empty"></span>
+                <span class="feedback-peg empty"></span>
+              </div>
+              <div class="attempt-time">-</div>
+            </div>
+          </div>
+
+          <!-- Legenda -->
+          <div class="legend">
+            <div class="legend-item">
+              <span class="indicator exact"></span>
+              <span>Exato: cor correta na posição correta</span>
+            </div>
+            <div class="legend-item">
+              <span class="indicator partial"></span>
+              <span>Parcial: cor correta na posição errada</span>
+            </div>
+            <div class="legend-item">
+              <span class="indicator" style="background: #ecf0f1;"></span>
+              <span>Vazio: cor não está na combinação</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção de Pontuação (se venceu) -->
+        <div class="score-section" *ngIf="selectedGameDetail.status === 'WON'">
+          <h4>Detalhes da Pontuação</h4>
+          <div class="score-details">
+            <p><strong>Pontuação Final:</strong> {{ calculateScore(selectedGameDetail) }} pontos</p>
+            <p class="score-formula">{{ formatScoreCalculation(selectedGameDetail) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDetail()">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>

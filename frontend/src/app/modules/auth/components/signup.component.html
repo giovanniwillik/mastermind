@@ -1,0 +1,105 @@
+<div class="signup-container">
+  <div class="signup-card">
+    <div class="signup-header">
+      <h1>Mastermind</h1>
+      <p>Criar Conta</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Utilizador</label>
+        <input
+          type="text"
+          id="username"
+          formControlName="username"
+          class="form-control"
+          placeholder="Escolha um utilizador (3-20 caracteres)"
+          [class.is-invalid]="f['username'].invalid && f['username'].touched"
+        />
+        <div class="error-message" *ngIf="f['username'].invalid && f['username'].touched">
+          <span *ngIf="f['username'].errors?.['required']">Utilizador é obrigatório</span>
+          <span *ngIf="f['username'].errors?.['minlength']">
+            Utilizador deve ter no mínimo 3 caracteres
+          </span>
+          <span *ngIf="f['username'].errors?.['maxlength']">
+            Utilizador não pode ter mais de 20 caracteres
+          </span>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          class="form-control"
+          placeholder="Seu endereço de email"
+          [class.is-invalid]="f['email'].invalid && f['email'].touched"
+        />
+        <div class="error-message" *ngIf="f['email'].invalid && f['email'].touched">
+          <span *ngIf="f['email'].errors?.['required']">Email é obrigatório</span>
+          <span *ngIf="f['email'].errors?.['email']">Email inválido</span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Crie uma senha (mínimo 6 caracteres)"
+          [class.is-invalid]="f['password'].invalid && f['password'].touched"
+        />
+        <div class="error-message" *ngIf="f['password'].invalid && f['password'].touched">
+          <span *ngIf="f['password'].errors?.['required']">Senha é obrigatória</span>
+          <span *ngIf="f['password'].errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Senha</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          class="form-control"
+          placeholder="Confirme sua senha"
+          [class.is-invalid]="
+            (f['confirmPassword'].invalid && f['confirmPassword'].touched) || passwordMismatch
+          "
+        />
+        <div class="error-message" *ngIf="f['confirmPassword'].invalid && f['confirmPassword'].touched">
+          <span *ngIf="f['confirmPassword'].errors?.['required']">Confirmação de senha é obrigatória</span>
+        </div>
+        <div class="error-message" *ngIf="passwordMismatch">
+          <span>As senhas não coincidem</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="signupForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Criar Conta</span>
+        <span *ngIf="isLoading">
+          <span class="spinner"></span>
+          Criando...
+        </span>
+      </button>
+    </form>
+
+    <!-- Link para Login -->
+    <div class="login-link">
+      <p>Já tem conta? <a href="javascript:void(0)" (click)="goToLogin()">Faça login</a></p>
+    </div>
+  </div>
+</div>

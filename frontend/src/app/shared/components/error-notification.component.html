@@ -1,0 +1,13 @@
+<div class="error-notification-container" *ngIf="currentError" [ngClass]="getErrorClass()">
+  <div class="notification-content">
+    <div class="notification-icon">
+      {{ getErrorIcon() }}
+    </div>
+    <div class="notification-message">
+      <p>{{ currentError.message }}</p>
+    </div>
+    <button class="notification-close" (click)="dismissError()" aria-label="Fechar notificação">
+      ✕
+    </button>
+  </div>
+</div>

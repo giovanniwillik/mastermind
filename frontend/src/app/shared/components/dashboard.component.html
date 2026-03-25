@@ -1,0 +1,196 @@
+<div class="dashboard-container">
+  <!-- Header/Navbar -->
+  <nav class="dashboard-navbar">
+    <div class="navbar-brand">
+      <h1>🎯 Mastermind</h1>
+    </div>
+    <div class="navbar-content">
+      <span class="welcome-text">Bem-vindo, {{ currentUsername }}!</span>
+      <button class="menu-toggle" (click)="toggleMenu()" [class.active]="showMenu">
+        ☰
+      </button>
+    </div>
+  </nav>
+
+  <!-- Menu Responsivo -->
+  <div class="menu-overlay" *ngIf="showMenu" (click)="toggleMenu()"></div>
+  <div class="menu-mobile" [class.show]="showMenu">
+    <button class="menu-item" (click)="navigateToRanking()">
+      📊 Ranking
+    </button>
+    <button class="menu-item" (click)="navigateToHistory()">
+      📋 Histórico
+    </button>
+    <button class="menu-item logout" (click)="logout()">
+      🚪 Logout
+    </button>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div class="dashboard-content">
+    <!-- Seção de Novo Jogo -->
+    <section class="quick-action">
+      <div class="action-card primary">
+        <div class="action-content">
+          <h2>Começar Novo Jogo</h2>
+          <p>Desafie-se a descobrir a combinação secreta em até 10 tentativas!</p>
+        </div>
+        <button
+          class="btn btn-large btn-primary"
+          (click)="startNewGame()"
+          [disabled]="isStartingGame"
+        >
+          <span *ngIf="!isStartingGame">🎮 Jogar Agora</span>
+          <span *ngIf="isStartingGame">
+            <span class="spinner-small"></span>
+            Iniciando...
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Grid de Ações Rápidas -->
+    <section class="quick-links">
+      <div class="link-card">
+        <h3>📊 Ranking</h3>
+        <p>Veja os melhores jogadores</p>
+        <button class="btn btn-secondary" (click)="navigateToRanking()">
+          Ver Ranking
+        </button>
+      </div>
+      <div class="link-card">
+        <h3>📋 Histórico</h3>
+        <p>Acompanhe seu progresso</p>
+        <button class="btn btn-secondary" (click)="navigateToHistory()">
+          Ver Histórico
+        </button>
+      </div>
+      <div class="link-card">
+        <h3>ℹ️ Sobre o Jogo</h3>
+        <p>Aprenda as regras</p>
+        <button class="btn btn-secondary" (click)="showRulesModal = true">
+          Como Jogar
+        </button>
+      </div>
+    </section>
+
+    <!-- Jogos Recentes -->
+    <section class="recent-games" *ngIf="!isLoadingGames && recentGames.length > 0">
+      <h2>Seus Últimos Jogos</h2>
+      <div class="games-list">
+        <div
+          class="game-item"
+          *ngFor="let game of recentGames"
+          [class]="getStatusClass(game.status)"
+        >
+          <div class="game-info">
+            <span class="game-status">{{ getStatusText(game.status) }}</span>
+            <span class="game-date">{{ game.startedAt | date:'short' }}</span>
+          </div>
+          <div class="game-stats">
+            <span>{{ game.currentAttempt }}/{{ game.maxAttempts }} tentativas</span>
+          </div>
+          <div class="game-actions" *ngIf="game.status === 'IN_PROGRESS'">
+            <button class="btn btn-small btn-primary" (click)="continueGame(game.gameCode)">
+              Continuar
+            </button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-link" (click)="navigateToHistory()">
+        Ver Todos os Jogos →
+      </button>
+    </section>
+
+    <!-- Carregando Jogos Recentes -->
+    <div class="loading" *ngIf="isLoadingGames">
+      <p>Carregando seus jogos...</p>
+    </div>
+
+    <!-- Nenhum Jogo -->
+    <section class="empty-state" *ngIf="!isLoadingGames && recentGames.length === 0">
+      <p>Você ainda não tem jogos. Comece um novo jogo para aparecer no histórico!</p>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Mastermind</h4>
+        <p>Jogo de lógica e dedução. Descubra a combinação secreta!</p>
+      </div>
+      <div class="footer-section">
+        <h4>Navegação</h4>
+        <ul>
+          <li><a href="javascript:void(0)" (click)="navigateToRanking()">Ranking</a></li>
+          <li><a href="javascript:void(0)" (click)="navigateToHistory()">Histórico</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Conta</h4>
+        <ul>
+          <li><a href="javascript:void(0)" (click)="logout()">Sair</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 Mastermind Game. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Modal de Regras -->
+  <div class="rules-modal-overlay" *ngIf="showRulesModal" (click)="closeRulesModal()"></div>
+  <div class="rules-modal" *ngIf="showRulesModal">
+    <div class="modal-header">
+      <h3>Como Jogar - Mastermind</h3>
+      <button class="close-btn" (click)="closeRulesModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="rules-section">
+        <h4>Objetivo do Jogo</h4>
+        <p>Descobrir uma combinação secreta de 4 cores em até 10 tentativas.</p>
+      </div>
+      <div class="rules-section">
+        <h4>Cores Disponíveis</h4>
+        <div class="colors-list">
+          <span class="color-tag red">🔴 Vermelho (A)</span>
+          <span class="color-tag green">🟢 Verde (B)</span>
+          <span class="color-tag blue">🔵 Azul (C)</span>
+          <span class="color-tag yellow">🟡 Amarelo (D)</span>
+          <span class="color-tag orange">🟠 Laranja (E)</span>
+          <span class="color-tag purple">🟣 Roxo (F)</span>
+        </div>
+      </div>
+      <div class="rules-section">
+        <h4>Como Funciona</h4>
+        <ul>
+          <li><strong>Exato:</strong> Sua cor está na posição correta</li>
+          <li><strong>Parcial:</strong> Sua cor está na combinação mas na posição errada</li>
+          <li><strong>Feedback:</strong> Após cada tentativa, você recebe a quantidade de acertos exatos e parciais</li>
+        </ul>
+      </div>
+      <div class="rules-section">
+        <h4>Exemplo</h4>
+        <p>Se a combinação correta é <strong>R G B Y</strong> e você adivinhar <strong>R B Y G</strong>:</p>
+        <ul>
+          <li>1 Exato (R na posição 1)</li>
+          <li>3 Parciais (B, Y, G estão na combinação mas em posições erradas)</li>
+        </ul>
+      </div>
+      <div class="rules-section">
+        <h4>Sistema de Pontuação</h4>
+        <p>A pontuação é calculada apenas para vitórias:</p>
+        <ul>
+          <li><strong>Vitória:</strong> Pontuação = (Tentativas restantes × 100) + (1000 - Duração em segundos)</li>
+          <li><strong>Mínimo:</strong> 100 pontos garantidos para qualquer vitória</li>
+          <li><strong>Derrota:</strong> 0 pontos</li>
+        </ul>
+        <p><em>Dica: Adivinhe rapidamente e com poucas tentativas para maximizar sua pontuação!</em></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="closeRulesModal()">Entendi!</button>
+    </div>
+  </div>
+</div>
