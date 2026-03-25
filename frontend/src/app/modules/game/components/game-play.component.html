@@ -1,0 +1,208 @@
+<div class="mastermind-board">
+  <div class="board-header">
+    <h2>Mastermind</h2>
+    <div class="game-info">
+      <span class="game-code">{{ currentGame?.gameCode | slice:0:8 }}</span>
+      <span class="attempts-counter">
+        {{ currentGame?.currentAttempt }} / {{ currentGame?.maxAttempts }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Tabuleiro de Jogo -->
+  <div class="board-container">
+    <div class="attempts-board">
+      <!-- Histórico de Tentativas (10 linhas) -->
+      <div class="board-rows">
+        <div
+          *ngFor="let attempt of currentGame?.attempts"
+          class="board-row completed"
+        >
+          <div class="row-number">{{ attempt.attemptNumber }}</div>
+          <div class="pegs">
+            <span
+              *ngFor="let color of attempt.guess.split('')"
+              class="peg"
+              [class]="'color-' + color.toLowerCase()"
+              [title]="colorNames[color]"
+            ></span>
+          </div>
+          <div class="feedback-pegs">
+            <span *ngFor="let i of [].constructor(attempt.exactMatches)" class="feedback-peg exact"></span>
+            <span *ngFor="let i of [].constructor(attempt.partialMatches)" class="feedback-peg partial"></span>
+            <span *ngFor="let i of [].constructor(4 - attempt.exactMatches - attempt.partialMatches)" class="feedback-peg empty"></span>
+          </div>
+        </div>
+
+        <!-- Tentativa Atual -->
+        <div class="board-row current-attempt" *ngIf="!isGameFinished()">
+          <div class="row-number tentativa-atual">{{ currentGame?.currentAttempt }}</div>
+          <div class="pegs">
+            <span
+              *ngFor="let color of (guessForm.get('guess')?.value || '').split(''); let i = index"
+              class="peg"
+              [class]="'color-' + color.toLowerCase()"
+              [title]="colorNames[color]"
+            ></span>
+            <span *ngFor="let empty of [].constructor(4 - (guessForm.get('guess')?.value || '').length)" class="peg empty"></span>
+          </div>
+          <div class="feedback-pegs">
+            <span class="feedback-placeholder">?</span>
+          </div>
+        </div>
+
+        <!-- Linhas Vazias (até 10 tentativas) -->
+        <div
+          *ngFor="let n of getEmptyRowsCount()"
+          class="board-row empty"
+        >
+          <div class="row-number">{{ (currentGame?.attempts?.length || 0) + (!isGameFinished() ? 1 : 0) + n + 1 }}</div>
+          <div class="pegs">
+            <span class="peg empty"></span>
+            <span class="peg empty"></span>
+            <span class="peg empty"></span>
+            <span class="peg empty"></span>
+          </div>
+          <div class="feedback-pegs">
+            <span class="feedback-peg empty"></span>
+            <span class="feedback-peg empty"></span>
+            <span class="feedback-peg empty"></span>
+            <span class="feedback-peg empty"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Painel de Controle -->
+    <div class="control-panel" *ngIf="!isGameFinished()">
+      <div class="panel-header">
+        <h3>Inserir Tentativa #{{ currentGame?.currentAttempt }}</h3>
+      </div>
+
+      <form [formGroup]="guessForm" (ngSubmit)="onSubmitGuess()" class="guess-form">
+        <!-- Botões de Cores -->
+        <div class="color-grid">
+          <button
+            type="button"
+            *ngFor="let color of validColors"
+            class="color-btn"
+            [class]="'color-' + color.toLowerCase()"
+            (click)="addColorToGuess(color)"
+            [disabled]="(guessForm.get('guess')?.value || '').length >= 4 || isSubmitting"
+            [title]="colorNames[color] + ' (' + color + ')'"
+          >
+            <span class="color-label">{{ color }}</span>
+            <span class="color-name">{{ colorNames[color] | slice:0:4 }}</span>
+          </button>
+        </div>
+
+        <!-- Preview da Tentativa -->
+        <div class="preview-section">
+          <label>Sua tentativa:</label>
+          <div class="preview-pegs">
+            <span
+              *ngFor="let color of (guessForm.get('guess')?.value || '').split(''); let i = index"
+              class="peg"
+              [class]="'color-' + color.toLowerCase()"
+            ></span>
+            <span *ngFor="let empty of [].constructor(4 - (guessForm.get('guess')?.value || '').length)" class="peg empty"></span>
+          </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="removeLastColor()"
+            [disabled]="!(guessForm.get('guess')?.value || '').length || isSubmitting"
+          >
+            ← Remover
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="clearGuess()"
+            [disabled]="!(guessForm.get('guess')?.value || '').length || isSubmitting"
+          >
+            Limpar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-submit"
+            [disabled]="guessForm.invalid || isSubmitting"
+          >
+            <span *ngIf="!isSubmitting">Submeter</span>
+            <span *ngIf="isSubmitting">
+              <span class="spinner"></span>
+              Enviando...
+            </span>
+          </button>
+        </div>
+
+        <!-- Mensagens de Validação -->
+        <div class="validation-messages" *ngIf="f['guess'].invalid && f['guess'].touched">
+          <span *ngIf="f['guess'].errors?.['required']">Digite uma combinação completa</span>
+          <span *ngIf="f['guess'].errors?.['pattern']">Use apenas A-F (6 cores)</span>
+          <span *ngIf="f['guess'].errors?.['minlength'] || f['guess'].errors?.['maxlength']">
+            Digite exatamente 4 cores
+          </span>
+        </div>
+      </form>
+
+      <!-- Legenda -->
+      <div class="color-legend">
+        <h4>Legenda de Cores:</h4>
+        <div class="legend-grid">
+          <div class="legend-item" *ngFor="let color of validColors">
+            <span class="peg" [class]="'color-' + color.toLowerCase()"></span>
+            <span class="legend-text">{{ color }} - {{ colorNames[color] }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Instrucciones -->
+      <div class="instructions">
+        <h4>Como Funciona:</h4>
+        <ul>
+          <li><span class="feedback-peg exact"></span> = Cor correta na posição correta</li>
+          <li><span class="feedback-peg partial"></span> = Cor correta na posição errada</li>
+          <li><span class="feedback-peg empty"></span> = Cor não está na combinação</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagem Final -->
+  <div class="game-end-overlay" *ngIf="isGameFinished()">
+    <div class="end-message" [class]="gameStatus?.toLowerCase()">
+      <h2 *ngIf="gameStatus === 'WON'">🎉 Parabéns!</h2>
+      <h2 *ngIf="gameStatus === 'LOST'">😔 Fim do Jogo</h2>
+      
+      <p *ngIf="gameStatus === 'WON'" class="result-text">
+        Você adivinhou a combinação em <strong>{{ currentGame?.currentAttempt }}</strong> tentativa(s)!
+      </p>
+      <p *ngIf="gameStatus === 'LOST'" class="result-text">
+        Você atingiu o máximo de {{ currentGame?.maxAttempts }} tentativas.
+      </p>
+
+      <div class="secret-code" *ngIf="gameStatus === 'LOST'">
+        <p>A combinação era:</p>
+        <div class="secret-pegs">
+          <span
+            *ngFor="let color of (currentGame?.expectedCode || '').split('')"
+            class="peg"
+            [class]="'color-' + color.toLowerCase()"
+            [title]="colorNames[color]"
+          ></span>
+        </div>
+      </div>
+
+      <div class="stats">
+        <p>Duração: <strong>{{ currentGame?.durationSeconds }}s</strong></p>
+      </div>
+
+      <button class="btn btn-primary" (click)="goToDashboard()">Voltar ao Dashboard</button>
+    </div>
+  </div>
+</div>

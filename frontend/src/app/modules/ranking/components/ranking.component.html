@@ -1,0 +1,78 @@
+<div class="ranking-container">
+  <div class="ranking-header">
+    <h2>Ranking dos Melhores Jogadores</h2>
+    <button class="btn btn-secondary" (click)="goToDashboard()">Voltar ao Dashboard</button>
+  </div>
+
+  <div class="ranking-controls">
+    <label for="limitSelect">Mostrar:</label>
+    <select
+      id="limitSelect"
+      class="limit-select"
+      [value]="selectedLimit"
+      (change)="onLimitChange($event)"
+    >
+      <option *ngFor="let limit of limitOptions" [value]="limit">
+        Top {{ limit }}
+      </option>
+    </select>
+  </div>
+
+  <div class="ranking-content">
+    <!-- Carregamento -->
+    <div class="loading" *ngIf="isLoading">
+      <p>Carregando ranking...</p>
+    </div>
+
+    <!-- Lista Vazia -->
+    <div class="empty-state" *ngIf="!isLoading && rankings.length === 0">
+      <p>Nenhum jogador encontrado no ranking.</p>
+    </div>
+
+    <!-- Tabela de Ranking -->
+    <table class="ranking-table" *ngIf="!isLoading && rankings.length > 0">
+      <thead>
+        <tr>
+          <th class="rank-col">Posição</th>
+          <th class="username-col">Utilizador</th>
+          <th class="score-col">Melhor Score</th>
+          <th class="games-col">Jogos</th>
+          <th class="duration-col">Duração Média</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let ranking of rankings; let i = index"
+          class="ranking-row"
+          [ngClass]="getRankingRowClass(i + 1)"
+        >
+          <td class="rank-col">
+            <span class="medal">{{ getMedalIcon(i + 1) }}</span>
+            <span class="position">{{ i + 1 }}</span>
+          </td>
+          <td class="username-col">
+            <span class="username">{{ ranking.username }}</span>
+          </td>
+          <td class="score-col">
+            <span class="score">{{ ranking.bestScore }}</span>
+          </td>
+          <td class="games-col">
+            <span class="games">{{ ranking.totalGames }}</span>
+          </td>
+          <td class="duration-col">
+            <span class="duration">{{ formatDuration(ranking.averageDuration) }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Legenda -->
+    <div class="ranking-legend" *ngIf="!isLoading && rankings.length > 0">
+      <p>
+        <strong>Melhor Score:</strong> Número de tentativas necessárias para adivinhar a combinação
+        (quanto menor, melhor)
+      </p>
+      <p><strong>Duração Média:</strong> Tempo médio gasto por tentativa bem-sucedida</p>
+    </div>
+  </div>
+</div>

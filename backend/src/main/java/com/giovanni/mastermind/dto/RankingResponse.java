@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RankingResponse {
+
     private String username;
     private Integer bestScore;
     private Integer totalGames;

@@ -7,11 +7,12 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
+    initialization-mode: always
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: none
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -19,6 +20,10 @@ spring:
   sql:
     init:
       mode: always
+      platform: postgresql
+
+  flyway:
+    enabled: false
 
   jackson:
     serialization:
@@ -28,8 +33,18 @@ server:
   port: ${SERVER_PORT:8080}
 
 jwt:
-  secret: ${JWT_SECRET:dGhpcyBpcyBhIHZlcnkgbG9uZyBzZWNyZXQga2V5IHRoYXQgc2hvdWxkIGJlIGF0IGxlYXN0IDMyIGNoYXJhY3RlcnMgbG9uZw==}
+  secret: ${JWT_SECRET:your-super-secure-secret-key-minimum-32-characters}
   expiration: ${JWT_EXPIRATION:86400000}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
+logging:
+  level:
+    root: ${LOGGING_LEVEL:INFO}
+    com.giovanni.mastermind: DEBUG
+
+environment: ${ENVIRONMENT:development}
 
 springdoc:
   swagger-ui:

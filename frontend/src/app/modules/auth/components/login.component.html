@@ -1,0 +1,64 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Mastermind</h1>
+      <p>Descobrir a Combinação</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <!-- Login -->
+      <div class="form-group">
+        <label for="login">Utilizador</label>
+        <input
+          type="text"
+          id="login"
+          formControlName="login"
+          class="form-control"
+          placeholder="Digite seu utilizador"
+          [class.is-invalid]="f['login'].invalid && f['login'].touched"
+        />
+        <div class="error-message" *ngIf="f['login'].invalid && f['login'].touched">
+          <span *ngIf="f['login'].errors?.['required']">Utilizador é obrigatório</span>
+          <span *ngIf="f['login'].errors?.['minlength']">
+            Utilizador deve ter no mínimo 3 caracteres
+          </span>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          placeholder="Digite sua senha"
+          [class.is-invalid]="f['password'].invalid && f['password'].touched"
+        />
+        <div class="error-message" *ngIf="f['password'].invalid && f['password'].touched">
+          <span *ngIf="f['password'].errors?.['required']">Senha é obrigatória</span>
+          <span *ngIf="f['password'].errors?.['minlength']">Senha deve ter no mínimo 6 caracteres</span>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Entrar</span>
+        <span *ngIf="isLoading">
+          <span class="spinner"></span>
+          Autenticando...
+        </span>
+      </button>
+    </form>
+
+    <!-- Link para Signup -->
+    <div class="signup-link">
+      <p>Não tem conta? <a href="javascript:void(0)" (click)="goToSignup()">Crie uma agora</a></p>
+    </div>
+  </div>
+</div>

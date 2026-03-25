@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuessRequest {
+
     @NotBlank(message = "Palpite é obrigatório")
     @Pattern(regexp = "[A-F]{4}", message = "Palpite deve ter exatamente 4 cores (A-F)")
     private String guess;

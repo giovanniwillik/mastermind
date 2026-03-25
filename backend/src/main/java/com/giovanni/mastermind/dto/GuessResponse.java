@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GuessResponse {
+
     private boolean gameOver;
     private String status; // "IN_PROGRESS", "WON", "LOST"
     private int exactMatches;

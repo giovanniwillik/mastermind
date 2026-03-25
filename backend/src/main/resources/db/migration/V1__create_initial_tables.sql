@@ -1,6 +1,6 @@
 -- Create users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -10,9 +10,9 @@ CREATE TABLE users (
 
 -- Create games table
 CREATE TABLE games (
-    id SERIAL PRIMARY KEY,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     game_code UUID NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL,
+    user_id BIGINT NOT NULL,
     expected_code VARCHAR(4) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
     final_score INTEGER NOT NULL DEFAULT 0,
@@ -26,8 +26,8 @@ CREATE TABLE games (
 
 -- Create attempts table
 CREATE TABLE attempts (
-    id SERIAL PRIMARY KEY,
-    game_id INTEGER NOT NULL,
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    game_id BIGINT NOT NULL,
     attempt_number INTEGER NOT NULL,
     guess VARCHAR(4) NOT NULL,
     exact_matches INTEGER NOT NULL DEFAULT 0,

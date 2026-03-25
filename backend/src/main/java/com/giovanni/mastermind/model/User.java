@@ -2,7 +2,7 @@ package com.giovanni.mastermind.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +27,9 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private Integer bestScore = 0;
