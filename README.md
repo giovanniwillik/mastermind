@@ -90,21 +90,25 @@ git clone https://github.com/seu-usuario/mastermind.git
 cd mastermind
 ```
 
-### Passo 2: Configurar Variáveis de Ambiente
+### Passo 2: Criar Arquivo de Variáveis de Ambiente
 
 ```bash
-# O arquivo .env já está incluído com valores padrão para desenvolvimento
-# Para produção, crie novo arquivo com valores seguros:
-cp .env.example .env.production
+# Copiar .env.example para criar .env para desenvolvimento
+cp .env.example .env
 
-# Edite com seus valores seguros
-nano .env.production  # ou seu editor favorito
+# O arquivo .env contém valores padrão que funcionam para desenvolvimento
+# Edite se necessário para seu ambiente local:
+nano .env  # ou seu editor favorito
+
+# Para produção, crie arquivo separado:
+cp .env.example .env.production
+# Edite .env.production com valores de produção (JWT_SECRET, DB_PASSWORD, etc.)
 
 # Depois use ao iniciar:
 # docker-compose --env-file .env.production up -d --build
 ```
 
-**Nota**: Valores padrão em `.env` funcionam imediatamente! Pule este passo se for usar desenvolvimento local.
+**Importante**: `.env` está em `.gitignore` e **não deve ser commitado**. Apenas `.env.example` fica no repositório.
 
 ### Passo 3: Iniciar Aplicação
 
@@ -258,11 +262,21 @@ npm run build
 
 ### Arquivo `.env`
 
-O projeto usa um arquivo `.env` para gerenciar todas as variáveis de ambiente. Este arquivo **nunca deve ser commitado** em repositórios públicos (já está em `.gitignore`).
+O projeto usa um arquivo `.env` para gerenciar todas as variáveis de ambiente.
 
-#### Desenvolvimento (Já Incluído)
+#### Como Criar o Arquivo `.env`
 
-Um arquivo `.env` já está incluído no repositório com valores padrão para desenvolvimento:
+**Apenas `.env.example` fica no repositório** (arquivo template). Cada desenvolvedor/ambiente deve criar seu próprio `.env`:
+
+```bash
+# Copiar arquivo exemplo para criar .env
+cp .env.example .env
+
+# Editar .env conforme necessário para seu ambiente
+# nano .env  # ou seu editor favorito
+```
+
+Arquivo `.env` resultante (exemplo com valores padrão para desenvolvimento):
 
 ```bash
 # DATABASE
@@ -290,9 +304,11 @@ LOGGING_LEVEL=INFO
 ENVIRONMENT=development
 ```
 
-#### Arquivo `.env.example` 
+#### Arquivo `.env.example` (Template no Repositório)
 
-Consulte `.env.example` para documentação completa de todas as variáveis disponíveis com explicações detalhadas.
+Consulte [`.env.example`](.env.example) para documentação completa de todas as variáveis disponíveis com explicações detalhadas.
+
+**Segurança**: Arquivo `.env` está em `.gitignore` e **nunca deve ser commitado**.
 
 ### Como Usar em Docker
 
