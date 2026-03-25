@@ -436,115 +436,27 @@ curl -X GET http://localhost:8080/api/games \
 
 ---
 
-## 📸 Screenshots e Demonstração
+## 📸 Demonstração (gifs)
 
-### [SCREENSHOT 1: Login/Signup]
-```
-Caminho: docs/screenshots/01-login-screen.png
+### [Login/Signup]
 
-Descrever:
-- Tela de login/signup do jogo
-- Validações em tempo real
-- Feedback visual para erros
-```
+![Demo Sign In e Log In](docs/gifs/signin_login.gif)
 
-### [SCREENSHOT 2: Game Board]
-```
-Caminho: docs/screenshots/02-game-board.png
+### [Sobre o Jogo]
 
-Descrever:
-- Tabuleiro de 10x4 (10 tentativas, 4 cores)
-- Paleta de cores (R, G, B, Y)
-- Feedback (exatos + parciais)
-- Contador de tentativas
-```
+![Acessando Infos em "Sobre o Jogo"](docs/gifs/sobre_o_jogo.gif)
 
-### [SCREENSHOT 3: Ranking]
-```
-Caminho: docs/screenshots/03-ranking.png
+### [Gameplay]
 
-Descrever:
-- Leaderboard com melhores jogadores
-- Pontuação máxima por jogador
-- Total de jogos e duração média
-- Interface responsiva
-```
+![Demo do Jogo](docs/gifs/gameplay.gif)
 
-### [GIF: Gameplay Completo]
-```
-Caminho: docs/gifs/gameplay-demo.gif
+### [Histórico]
 
-Conteúdo:
-1. Login com credenciais
-2. Iniciar novo jogo
-3. Fazer 3-4 tentativas com feedback
-4. Ganhar jogo
-5. Ver histórico
-6. Visualizar ranking
-(Total: ~15-20 segundos)
-```
+![Demo Histórico de Jogos](docs/gifs/historico.gif)
 
----
+### [Ranking]
 
-## 🧪 Testando a Aplicação
-
-### Cenário 1: Signup e Primeiros Passos
-
-```bash
-# 1. Registrar novo usuário
-curl -X POST http://localhost:8080/api/auth/signup \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "testuser",
-    "email": "test@example.com",
-    "password": "testpass123"
-  }'
-
-# 2. Fazer login
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "login": "testuser",
-    "password": "testpass123"
-  }'
-
-# Salvar o token para requisições seguintes
-TOKEN="eyJhbGciOiJIUzI1NiJ9..."
-
-# 3. Iniciar jogo
-curl -X POST http://localhost:8080/api/games/start \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{}'
-
-# Resposta contém gameCode
-
-# 4. Fazer tentativa (exemplo: RGBY)
-GAME_CODE="uuid-do-jogo"
-curl -X POST http://localhost:8080/api/games/$GAME_CODE/guess \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"guess": "RGBY"}'
-
-# Resposta: { "exactMatches": 2, "partialMatches": 1, ... }
-```
-
-### Cenário 2: Verificar Ranking
-
-```bash
-# Ranking é público (sem autenticação necessária)
-curl http://localhost:8080/api/ranking
-
-# Resposta esperada:
-# [
-#   {
-#     "username": "user1",
-#     "bestScore": 900,
-#     "totalGames": 5,
-#     "averageDuration": 120.5
-#   }
-# ]
-```
+![Demo Ranking de Jogadores](docs/gifs/ranking.gif)
 
 ---
 
