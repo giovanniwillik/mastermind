@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/games")
+@RequestMapping("/api/games")
 @RequiredArgsConstructor
 public class GameController {
 

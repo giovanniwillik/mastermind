@@ -1,5 +1,5 @@
 -- Create users table
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -9,7 +9,7 @@ CREATE TABLE users (
 );
 
 -- Create games table
-CREATE TABLE games (
+CREATE TABLE IF NOT EXISTS games (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     game_code UUID NOT NULL UNIQUE,
     user_id BIGINT NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE games (
 );
 
 -- Create attempts table
-CREATE TABLE attempts (
+CREATE TABLE IF NOT EXISTS attempts (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     game_id BIGINT NOT NULL,
     attempt_number INTEGER NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE attempts (
 );
 
 -- Create indexes for better query performance
-CREATE INDEX idx_games_user_id ON games(user_id);
-CREATE INDEX idx_games_status ON games(status);
-CREATE INDEX idx_attempts_game_id ON attempts(game_id);
-CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX IF NOT EXISTS idx_games_user_id ON games(user_id);
+CREATE INDEX IF NOT EXISTS idx_games_status ON games(status);
+CREATE INDEX IF NOT EXISTS idx_attempts_game_id ON attempts(game_id);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
+
     @NotBlank(message = "Usuário ou e-mail é obrigatório")
     private String login; // Pode ser username ou email
 
